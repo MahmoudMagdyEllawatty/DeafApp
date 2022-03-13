@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">DeafKeyboard</string>
+    <string name="pick_image_intent_text">Pick Image</string>
+    <string name="no_result_found">No Data Found</string>
+    <string name="required">Required</string>
+    <string name="submit">Submit</string>
+    <string name="previous">Previous</string>
+    <string name="next">Next</string>
+</resources>

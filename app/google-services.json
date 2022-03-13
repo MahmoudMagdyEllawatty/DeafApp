@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "218362163669",
+    "project_id": "deafkeyboard",
+    "storage_bucket": "deafkeyboard.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:218362163669:android:f395a37e4e147a18788d5c",
+        "android_client_info": {
+          "package_name": "com.app.deafkeyboard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "218362163669-2578ttgi35b26u33g6gidn8el1t76h4g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOskxMxpomCExkoQmHKj2eOZhTdPiu_oI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "218362163669-2578ttgi35b26u33g6gidn8el1t76h4g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
