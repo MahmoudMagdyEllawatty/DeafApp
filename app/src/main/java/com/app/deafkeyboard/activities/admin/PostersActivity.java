@@ -1,12 +1,21 @@
 package com.app.deafkeyboard.activities.admin;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,9 +28,13 @@ import android.widget.Toast;
 
 import com.app.deafkeyboard.R;
 import com.app.deafkeyboard.adapters.PostersAdapter;
+import com.app.deafkeyboard.callback.FileUploadCallback;
 import com.app.deafkeyboard.callback.PostersCallback;
+import com.app.deafkeyboard.controller.ImageController;
 import com.app.deafkeyboard.controller.PostersController;
 import com.app.deafkeyboard.model.Posters;
+import com.app.deafkeyboard.utils.ImagePicker;
+import com.app.deafkeyboard.utils.LoadingHelper;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -37,6 +50,10 @@ public class PostersActivity extends AppCompatActivity {
     SwipeRefreshLayout mSwipeRefreshLayout;
     FloatingActionButton add;
 
+    private static final int RESULT_LOAD_IMAGES = 25;
+    String imageURL = "";
+    LoadingHelper loadingHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +63,7 @@ public class PostersActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);//for back button
         getSupportActionBar().setTitle("Posters");
 
+        loadingHelper = new LoadingHelper(this);
         add = findViewById(R.id.fab_add);
         no_data_fount = findViewById(R.id.no_data_fount);
         recyclerView = findViewById(R.id.cart_recyclerview);
@@ -79,7 +97,53 @@ public class PostersActivity extends AppCompatActivity {
             }
         });
     }
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    private boolean checkReadPermission(){
+        int permissionWriteExternal = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (permissionWriteExternal != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,new String[]{ Manifest.permission.READ_EXTERNAL_STORAGE},2);
+            return false;
+        }else{
+            return true;
+        }
+    }
 
+
+
+    private void pickDoc(){
+        Intent chooseImageIntent = ImagePicker.getPickImageIntent(this);
+        startActivityForResult(chooseImageIntent, RESULT_LOAD_IMAGES);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RESULT_LOAD_IMAGES && resultCode == Activity.RESULT_OK) {
+
+
+            loadingHelper.showLoading("Uploading Image");
+            Uri uri = ImagePicker.getUriFromResult(this, resultCode, data);;
+            if(uri == null){
+                Toast.makeText(this, "Cannot load image", Toast.LENGTH_SHORT).show();
+            }else{
+                new ImageController().uploadImage(uri, new FileUploadCallback() {
+                    @Override
+                    public void onSuccess(String url) {
+                        imageURL = url;
+                        loadingHelper.dismissLoading();
+                    }
+
+                    @Override
+                    public void onFail(String msg) {
+                        loadingHelper.dismissLoading();
+                    }
+                });
+            }
+
+        }
+    }
     private void showAddDialog(){
         AlertDialog.Builder dialog = new AlertDialog.Builder(PostersActivity.this);
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_station, null);
@@ -91,9 +155,19 @@ public class PostersActivity extends AppCompatActivity {
         final EditText etxtTitle = dialogView.findViewById(R.id.etxt_title);
         final EditText etxt_description = dialogView.findViewById(R.id.etxt_description);
         final TextView title = dialogView.findViewById(R.id.title);
+        final ImageButton selectImage = dialogView.findViewById(R.id.select_image);
 
 
         title.setText("Add Poster");
+
+        selectImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(checkReadPermission()){
+                    pickDoc();
+                }
+            }
+        });
 
 
         final AlertDialog alertDialog = dialog.create();
@@ -118,7 +192,7 @@ public class PostersActivity extends AppCompatActivity {
 
             Posters posters = new Posters();
             posters.setDescription(etxt_description.getText().toString());
-            posters.setImage("");
+            posters.setImage(imageURL);
             posters.setKey("");
             posters.setTitle(etxtTitle.getText().toString());
 

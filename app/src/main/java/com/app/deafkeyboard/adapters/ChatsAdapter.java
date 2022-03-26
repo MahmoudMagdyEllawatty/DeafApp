@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,7 @@ import com.app.deafkeyboard.model.Chat;
 import com.app.deafkeyboard.utils.SharedData;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder> {
 
@@ -70,7 +72,10 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder> 
                 context.startActivity(intent);
             }
         });
+
     }
+
+
 
     @Override
     public int getItemCount() {
@@ -79,8 +84,10 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder> 
 
     class ViewHolder extends RecyclerView.ViewHolder{
         TextView title,msg,date;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+
 
             title = itemView.findViewById(R.id.user_name);
             msg = itemView.findViewById(R.id.msg);

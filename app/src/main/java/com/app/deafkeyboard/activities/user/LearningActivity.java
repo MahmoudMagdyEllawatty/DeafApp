@@ -49,7 +49,7 @@ public class LearningActivity extends AppCompatActivity {
 
 
         if(SharedData.learn_type == 1){
-            letters = new LettersHelper().getLetters();
+            letters = new LettersHelper(true).getLetters();
         }else if(SharedData.learn_type == 2){
             numbers = new NumbersHelper().getLetters();
         }else if(SharedData.learn_type == 3){

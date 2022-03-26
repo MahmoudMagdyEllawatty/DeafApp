@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -12,28 +13,45 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.textservice.SentenceSuggestionsInfo;
+import android.view.textservice.SpellCheckerSession;
+import android.view.textservice.SuggestionsInfo;
+import android.view.textservice.TextInfo;
+import android.view.textservice.TextServicesManager;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.app.deafkeyboard.R;
+import com.app.deafkeyboard.adapters.SignLettersAdapter;
 import com.app.deafkeyboard.callback.ChatCallback;
 import com.app.deafkeyboard.controller.ChatController;
 import com.app.deafkeyboard.model.Chat;
+import com.app.deafkeyboard.utils.ArabicSignHelper;
+import com.app.deafkeyboard.utils.EnglishSignHelper;
 import com.app.deafkeyboard.utils.LettersHelper;
 import com.app.deafkeyboard.utils.LoadingHelper;
+import com.app.deafkeyboard.utils.MyDialogFragment;
 import com.app.deafkeyboard.utils.SharedData;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -43,6 +61,7 @@ public class UserChatMessagesActivity extends AppCompatActivity {
 
     static EditText message;
     ImageView send,deafKeyboard;
+
 
     ArrayList<Chat.ChatDetails> chatDetails = new ArrayList<>();
     int side = 0;
@@ -137,8 +156,31 @@ public class UserChatMessagesActivity extends AppCompatActivity {
     }
 
     private void showSignDialog(){
-        MyDialogFragment myDialogFragment = new MyDialogFragment();
-        myDialogFragment.show(getSupportFragmentManager(),"Tag");
+        new LoadingHelper(UserChatMessagesActivity.this)
+                .showDialog("Select Language", "Please,Select Ar or En", "Ar", "En", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        SharedData.isEnglish = false;
+                        FragmentManager fm = getSupportFragmentManager();
+                        MyDialogFragment editNameDialogFragment = MyDialogFragment.newInstance("Some Title");
+                        editNameDialogFragment.message = message;
+                        editNameDialogFragment.context = UserChatMessagesActivity.this;
+                        editNameDialogFragment.show(fm, "fragment_edit_name");
+//                        MyDialogFragment myDialogFragment = new MyDialogFragment();
+//                        myDialogFragment.show(getSupportFragmentManager(),"Tag");
+                    }
+                }, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        SharedData.isEnglish = true;
+                        FragmentManager fm = getSupportFragmentManager();
+                        MyDialogFragment editNameDialogFragment = MyDialogFragment.newInstance("Some Title");
+                        editNameDialogFragment.message = message;
+                        editNameDialogFragment.context = UserChatMessagesActivity.this;
+                        editNameDialogFragment.show(fm, "fragment_edit_name");
+                    }
+                });
+
     }
 
     @Override
@@ -182,7 +224,77 @@ public class UserChatMessagesActivity extends AppCompatActivity {
             holder.message1.setText(detail.getMsg());
             holder.date1.setText(detail.getDate());
 
+            holder.translate.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    showTranslateDialog(detail.getMsg());
+                }
+            });
 
+
+            holder.translate1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    showTranslateDialog(detail.getMsg());
+                }
+            });
+
+        }
+
+        private void showTranslateDialog(String msg){
+            if(isEnglish(msg)){
+                showEnglishTranslator(msg);
+            }else{
+                showArabicTranslator(msg);
+            }
+        }
+
+        private void showEnglishTranslator(String msg){
+                ArrayList<Integer> signs = new EnglishSignHelper(msg).images;
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(UserChatMessagesActivity.this);
+                View view = LayoutInflater.from(UserChatMessagesActivity.this)
+                        .inflate(R.layout.translate_layout,null);
+
+                TextView mainMessage = view.findViewById(R.id.main_text);
+                RecyclerView list = view.findViewById(R.id.list);
+
+                mainMessage.setText(msg);
+                list.setItemAnimator(new DefaultItemAnimator());
+                list.setLayoutManager(new GridLayoutManager(UserChatMessagesActivity.this,3));
+                list.setAdapter(new SignLettersAdapter(signs,UserChatMessagesActivity.this));
+
+                alertDialog.setView(view);
+                alertDialog.show();
+        }
+
+        private void showArabicTranslator(String msg){
+            ArrayList<Integer> signs = new ArabicSignHelper(msg).images;
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(UserChatMessagesActivity.this);
+            View view = LayoutInflater.from(UserChatMessagesActivity.this)
+                    .inflate(R.layout.translate_layout,null);
+
+            TextView mainMessage = view.findViewById(R.id.main_text);
+            RecyclerView list = view.findViewById(R.id.list);
+
+            mainMessage.setText(msg);
+            list.setItemAnimator(new DefaultItemAnimator());
+            list.setLayoutManager(new RtlGridLayoutManager(UserChatMessagesActivity.this,3));
+            list.setAdapter(new SignLettersAdapter(signs,UserChatMessagesActivity.this));
+
+            alertDialog.setView(view);
+            alertDialog.show();
+        }
+
+
+
+        private boolean isEnglish(String msg){
+            String[] englishLetters = new String[]{ "a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","x","y","z"};
+            for (char letter: msg.toLowerCase().toCharArray()) {
+                if(Arrays.asList(englishLetters).contains(String.valueOf(letter))){
+                    return true;
+                }
+            }
+            return false;
         }
 
         @Override
@@ -192,13 +304,18 @@ public class UserChatMessagesActivity extends AppCompatActivity {
 
         class ViewHolder extends RecyclerView.ViewHolder{
 
-            LinearLayout relativeLayout;
+            RelativeLayout relativeLayout;
             TextView message,date;
 
-            LinearLayout relativeLayout1;
+            RelativeLayout relativeLayout1;
             TextView message1,date1;
+
+            ImageButton translate,translate1;
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
+
+                translate = itemView.findViewById(R.id.translate);
+                translate1 = itemView.findViewById(R.id.translate1);
 
                 relativeLayout = itemView.findViewById(R.id.my_side);
                 message = itemView.findViewById(R.id.message);
@@ -214,94 +331,24 @@ public class UserChatMessagesActivity extends AppCompatActivity {
 
 
 
-    public static  class MyDialogFragment extends DialogFragment {
+    public class RtlGridLayoutManager extends GridLayoutManager {
 
-        private RecyclerView mRecyclerView;
+        public RtlGridLayoutManager(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+            super(context, attrs, defStyleAttr, defStyleRes);
+        }
+
+        public RtlGridLayoutManager(Context context, int spanCount) {
+            super(context, spanCount);
+        }
+
+        public RtlGridLayoutManager(Context context, int spanCount, int orientation, boolean reverseLayout) {
+            super(context, spanCount, orientation, reverseLayout);
+        }
 
         @Override
-        public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-            mRecyclerView = new RecyclerView(getContext());
-            // you can use LayoutInflater.from(getContext()).inflate(...) if you have xml layout
-            mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(),3));
-            mRecyclerView.setAdapter(new KeyboardAdapter());
-
-            return new AlertDialog.Builder(getActivity())
-                    .setTitle("Sign Keyboard")
-                    .setView(mRecyclerView)
-                    .setPositiveButton(android.R.string.ok,
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int whichButton) {
-                                    // do something
-                                }
-                            }
-                    ).create();
+        protected boolean isLayoutRTL(){
+            return true;
         }
-
-
-        private class KeyboardAdapter extends RecyclerView.Adapter<KeyboardAdapter.ViewHolder> {
-
-            ArrayList<LettersHelper.Letters> letters ;
-
-            public KeyboardAdapter() {
-                letters = new ArrayList<>();
-                letters.add(new LettersHelper.Letters(R.mipmap.space,"Space"));
-                letters.add(new LettersHelper.Letters(R.mipmap.remove,"Remove"));
-                letters.addAll(new LettersHelper().getLetters());
-            }
-
-            @NonNull
-            @Override
-            public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(getActivity())
-                        .inflate(R.layout.letter_item,parent,false);
-                return new ViewHolder(view);
-            }
-
-            @Override
-            public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-                LettersHelper.Letters letter = letters.get(position);
-
-                Picasso.get()
-                        .load(letter.getImage())
-                        .into(holder.letter);
-
-
-                holder.letter.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        String currentLetter = letter.getName();
-                        String msg = message.getText().toString();
-                        if(currentLetter.equals("Space")){
-                            msg +=" ";
-                        }else if(currentLetter.equals("Remove")){
-                            if(msg.length() > 0)
-                                msg = msg.substring(0,msg.length()-1);
-                        }else{
-                            msg += currentLetter.toLowerCase();
-                        }
-                        message.setText(msg);
-                    }
-                });
-
-            }
-
-            @Override
-            public int getItemCount() {
-                return letters.size();
-            }
-
-            class ViewHolder extends RecyclerView.ViewHolder{
-
-                ImageView letter;
-                public ViewHolder(@NonNull View itemView) {
-                    super(itemView);
-                    letter = itemView.findViewById(R.id.letter);
-                }
-            }
-        }
-
     }
-
-
 
 }

@@ -18,4 +18,5 @@ public class SharedData {
     public static Chat chat;
     public static MutableLiveData<Chat> mCurrentIndex = new MutableLiveData<>();
     public static int learn_type;
+    public static boolean isEnglish;
 }
