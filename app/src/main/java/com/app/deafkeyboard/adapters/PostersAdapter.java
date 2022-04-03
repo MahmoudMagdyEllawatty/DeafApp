@@ -61,9 +61,12 @@ public class PostersAdapter extends RecyclerView.Adapter<PostersAdapter.ViewHold
         Posters posters1  = posters.get(position);
 
         if(posters1.getImage() != null){
-            Picasso.get()
-                    .load(posters1.getImage())
-                    .into(holder.image);
+            if(!posters1.getImage().equals("")){
+                Picasso.get()
+                        .load(posters1.getImage())
+                        .into(holder.image);
+            }
+
         }
 
 

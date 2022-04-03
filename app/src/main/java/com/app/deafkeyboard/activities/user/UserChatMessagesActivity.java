@@ -47,6 +47,7 @@ import com.app.deafkeyboard.utils.LettersHelper;
 import com.app.deafkeyboard.utils.LoadingHelper;
 import com.app.deafkeyboard.utils.MyDialogFragment;
 import com.app.deafkeyboard.utils.SharedData;
+import com.app.deafkeyboard.utils.StickerFragment;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -55,12 +56,14 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 
+import pl.droidsonroids.gif.GifImageView;
+
 public class UserChatMessagesActivity extends AppCompatActivity {
 
     RecyclerView messagesList;
 
     static EditText message;
-    ImageView send,deafKeyboard;
+    ImageView send,deafKeyboard,sticker;
 
 
     ArrayList<Chat.ChatDetails> chatDetails = new ArrayList<>();
@@ -86,6 +89,7 @@ public class UserChatMessagesActivity extends AppCompatActivity {
         }
 
 
+        SharedData.side = side;
         messagesList = findViewById(R.id.messages_list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setReverseLayout(true);
@@ -97,7 +101,14 @@ public class UserChatMessagesActivity extends AppCompatActivity {
         message = findViewById(R.id.message);
         send = findViewById(R.id.send);
         deafKeyboard = findViewById(R.id.deaf_keyboard);
+        sticker = findViewById(R.id.sticker_keyboard);
 
+        sticker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showStickerDialog();
+            }
+        });
 
         chatDetails = SharedData.chat.getChatDetails();
 
@@ -153,6 +164,12 @@ public class UserChatMessagesActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void showStickerDialog(){
+        FragmentManager fm = getSupportFragmentManager();
+        StickerFragment editNameDialogFragment = StickerFragment.newInstance("Some Title");
+        editNameDialogFragment.show(fm, "fragment_edit_name");
     }
 
     private void showSignDialog(){
@@ -223,6 +240,31 @@ public class UserChatMessagesActivity extends AppCompatActivity {
 
             holder.message1.setText(detail.getMsg());
             holder.date1.setText(detail.getDate());
+
+            if(detail.getMsg().toLowerCase().contains("gif:")){
+                holder.gif1.setVisibility(View.VISIBLE);
+                holder.gif2.setVisibility(View.VISIBLE);
+
+                holder.message.setVisibility(View.GONE);
+                holder.message1.setVisibility(View.GONE);
+
+                holder.translate1.setVisibility(View.GONE);
+                holder.translate.setVisibility(View.GONE);
+
+                Integer image = Integer.parseInt(detail.getMsg().substring(4));
+                holder.gif1.setBackgroundResource(image);
+                holder.gif2.setBackgroundResource(image);
+
+            }else{
+                holder.gif1.setVisibility(View.GONE);
+                holder.gif2.setVisibility(View.GONE);
+
+                holder.message.setVisibility(View.VISIBLE);
+                holder.message1.setVisibility(View.VISIBLE);
+
+                holder.translate1.setVisibility(View.VISIBLE);
+                holder.translate.setVisibility(View.VISIBLE);
+            }
 
             holder.translate.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -311,6 +353,8 @@ public class UserChatMessagesActivity extends AppCompatActivity {
             TextView message1,date1;
 
             ImageButton translate,translate1;
+
+            GifImageView gif1,gif2;
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
 
@@ -320,6 +364,9 @@ public class UserChatMessagesActivity extends AppCompatActivity {
                 relativeLayout = itemView.findViewById(R.id.my_side);
                 message = itemView.findViewById(R.id.message);
                 date = itemView.findViewById(R.id.date);
+
+                gif1 = itemView.findViewById(R.id.gif1);
+                gif2 = itemView.findViewById(R.id.gif2);
 
 
                 relativeLayout1 = itemView.findViewById(R.id.his_side);
