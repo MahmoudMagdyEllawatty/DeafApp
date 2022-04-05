@@ -302,7 +302,7 @@ public class UserChatMessagesActivity extends AppCompatActivity {
 
                 mainMessage.setText(msg);
                 list.setItemAnimator(new DefaultItemAnimator());
-                list.setLayoutManager(new GridLayoutManager(UserChatMessagesActivity.this,3));
+                list.setLayoutManager(new LtrGridLayoutManager(UserChatMessagesActivity.this,3));
                 list.setAdapter(new SignLettersAdapter(signs,UserChatMessagesActivity.this));
 
                 alertDialog.setView(view);
@@ -395,6 +395,27 @@ public class UserChatMessagesActivity extends AppCompatActivity {
         @Override
         protected boolean isLayoutRTL(){
             return true;
+        }
+    }
+
+
+    public class LtrGridLayoutManager extends GridLayoutManager {
+
+        public LtrGridLayoutManager(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+            super(context, attrs, defStyleAttr, defStyleRes);
+        }
+
+        public LtrGridLayoutManager(Context context, int spanCount) {
+            super(context, spanCount);
+        }
+
+        public LtrGridLayoutManager(Context context, int spanCount, int orientation, boolean reverseLayout) {
+            super(context, spanCount, orientation, reverseLayout);
+        }
+
+        @Override
+        protected boolean isLayoutRTL(){
+            return false;
         }
     }
 
