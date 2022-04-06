@@ -14,6 +14,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -39,6 +41,8 @@ import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+
+import in.mayanknagwanshi.imagepicker.ImageSelectActivity;
 
 public class PostersActivity extends AppCompatActivity {
 
@@ -120,7 +124,31 @@ public class PostersActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RESULT_LOAD_IMAGES && resultCode == Activity.RESULT_OK) {
+        if (requestCode == 1213 && resultCode == RESULT_OK && null != data) {
+
+            loadingHelper.showLoading("Uploading Image");
+            String mediaPath = data.getStringExtra(ImageSelectActivity.RESULT_FILE_PATH);
+            Bitmap selectedImage = BitmapFactory.decodeFile(mediaPath);
+            Uri uri = Uri.parse(mediaPath);
+            if(uri == null){
+                Toast.makeText(this, "Cannot load image", Toast.LENGTH_SHORT).show();
+            }else{
+                new ImageController().uploadImage(uri, new FileUploadCallback() {
+                    @Override
+                    public void onSuccess(String url) {
+                        imageURL = url;
+                        loadingHelper.dismissLoading();
+                    }
+
+                    @Override
+                    public void onFail(String msg) {
+                        loadingHelper.dismissLoading();
+                    }
+                });
+            }
+
+        }
+        else if (requestCode == RESULT_LOAD_IMAGES && resultCode == Activity.RESULT_OK) {
 
 
             loadingHelper.showLoading("Uploading Image");
@@ -164,7 +192,11 @@ public class PostersActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(checkReadPermission()){
-                    pickDoc();
+                    Intent intent = new Intent(PostersActivity.this, ImageSelectActivity.class);
+                    intent.putExtra(ImageSelectActivity.FLAG_COMPRESS, true);//default is true
+                    intent.putExtra(ImageSelectActivity.FLAG_CAMERA, true);//default is true
+                    intent.putExtra(ImageSelectActivity.FLAG_GALLERY, true);//default is true
+                    startActivityForResult(intent, 1213);
                 }
             }
         });
