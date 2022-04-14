@@ -69,7 +69,7 @@ public class StickerFragment extends DialogFragment{
         mRecyclerView = view.findViewById(R.id.signs);
 
         // you can use LayoutInflater.from(getContext()).inflate(...) if you have xml layout
-        mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(),1));
+        mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(),2));
         mRecyclerView.setAdapter(new KeyboardAdapter());
 
     }

@@ -31,6 +31,7 @@ import com.app.deafkeyboard.controller.PostersController;
 import com.app.deafkeyboard.model.Posters;
 import com.app.deafkeyboard.utils.ImagePicker;
 import com.app.deafkeyboard.utils.LoadingHelper;
+import com.app.deafkeyboard.utils.SharedData;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -194,6 +195,11 @@ public class PostersAdapter extends RecyclerView.Adapter<PostersAdapter.ViewHold
             msg = itemView.findViewById(R.id.msg);
             img_delete = itemView.findViewById(R.id.img_delete);
             img_edit = itemView.findViewById(R.id.img_edit);
+
+            if(SharedData.loggedUser != null){
+                img_delete.setVisibility(View.GONE);
+                img_edit.setVisibility(View.GONE);
+            }
 
         }
     }

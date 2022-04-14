@@ -15,7 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.DeafKeyboard">
-        <activity android:name=".activities.user.SelectLearningActivity"/>
+        <activity android:name=".activities.user.ExamActivity"></activity>
+        <activity android:name=".activities.user.SelectLearningActivity" />
         <activity android:name=".activities.user.LearningActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".activities.user.UserChatMessagesActivity" />
@@ -42,7 +43,7 @@
             <!-- ressource file to create -->
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"></meta-data>
+                android:resource="@xml/file_paths" />
         </provider>
     </application>
 

@@ -7,4 +7,7 @@
     <string name="previous">Previous</string>
     <string name="next">Next</string>
     <string name="add_photo">Select Photo</string>
+    <string name="cancel">Cancel</string>
+    <string name="another_">Another</string>
+    <string name="another_try">Try Again</string>
 </resources>

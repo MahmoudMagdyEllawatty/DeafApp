@@ -32,6 +32,17 @@ public class SelectLearningActivity extends AppCompatActivity {
                     }
                 });
 
+        (findViewById(R.id.exam))
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(SelectLearningActivity.this,
+                                ExamActivity.class);
+                        startActivity(intent);
+                    }
+                });
+
+
         (findViewById(R.id.chat))
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -51,6 +62,7 @@ public class SelectLearningActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
+
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
