@@ -17,6 +17,7 @@ import com.app.deafkeyboard.LoginActivity;
 import com.app.deafkeyboard.R;
 import com.app.deafkeyboard.activities.admin.AdminDashboardActivity;
 import com.app.deafkeyboard.activities.admin.PostersActivity;
+import com.app.deafkeyboard.activities.user.ExamActivity;
 import com.app.deafkeyboard.activities.user.LearningActivity;
 import com.app.deafkeyboard.activities.user.SelectLearningActivity;
 import com.app.deafkeyboard.activities.user.UserChatsActivity;
@@ -69,6 +70,21 @@ public class DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.View
                     context.startActivity(intent);
                 }else if(dashboardItems.get(position).getEnglish().equals("Chat")){
                     Intent intent = new Intent(context, UserChatsActivity.class);
+                    context.startActivity(intent);
+                }else if(dashboardItems.get(position).getEnglish().equals("Letters")){
+                    SharedData.learn_type = 1;
+                    Intent intent = new Intent(context, LearningActivity.class);
+                    context.startActivity(intent);
+                }else if(dashboardItems.get(position).getEnglish().equals("Numbers")){
+                    SharedData.learn_type = 2;
+                    Intent intent = new Intent(context, LearningActivity.class);
+                    context.startActivity(intent);
+                }else if(dashboardItems.get(position).getEnglish().equals("Animals")){
+                    SharedData.learn_type = 3;
+                    Intent intent = new Intent(context, LearningActivity.class);
+                    context.startActivity(intent);
+                }else if(dashboardItems.get(position).getEnglish().equals("Exam")){
+                    Intent intent = new Intent(context, ExamActivity.class);
                     context.startActivity(intent);
                 }else if(dashboardItems.get(position).getEnglish().equals("Logout")){
                     SharedData.loggedUser = null;
