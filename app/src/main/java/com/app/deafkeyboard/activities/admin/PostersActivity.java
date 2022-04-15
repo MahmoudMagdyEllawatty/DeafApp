@@ -42,7 +42,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
-import in.mayanknagwanshi.imagepicker.ImageSelectActivity;
 
 public class PostersActivity extends AppCompatActivity {
 
@@ -124,12 +123,12 @@ public class PostersActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1213 && resultCode == RESULT_OK && null != data) {
+        if (resultCode == RESULT_OK && null != data) {
 
             loadingHelper.showLoading("Uploading Image");
-            String mediaPath = data.getStringExtra(ImageSelectActivity.RESULT_FILE_PATH);
-            Bitmap selectedImage = BitmapFactory.decodeFile(mediaPath);
-            Uri uri = Uri.parse(mediaPath);
+
+            //Bitmap selectedImage = BitmapFactory.decodeFile(mediaPath);
+            Uri uri = data.getData();
             if(uri == null){
                 Toast.makeText(this, "Cannot load image", Toast.LENGTH_SHORT).show();
             }else{
@@ -192,11 +191,12 @@ public class PostersActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(checkReadPermission()){
-                    Intent intent = new Intent(PostersActivity.this, ImageSelectActivity.class);
-                    intent.putExtra(ImageSelectActivity.FLAG_COMPRESS, true);//default is true
-                    intent.putExtra(ImageSelectActivity.FLAG_CAMERA, true);//default is true
-                    intent.putExtra(ImageSelectActivity.FLAG_GALLERY, true);//default is true
-                    startActivityForResult(intent, 1213);
+
+                    com.github.dhaval2404.imagepicker.ImagePicker.with(PostersActivity.this)
+                            .crop()	    			//Crop image(Optional), Check Customization for more option
+                            .compress(1024)			//Final image size will be less than 1 MB(Optional)
+                            .maxResultSize(1080, 1080)	//Final image resolution will be less than 1080 x 1080(Optional)
+                            .start();
                 }
             }
         });
