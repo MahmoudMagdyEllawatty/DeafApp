@@ -29,12 +29,13 @@ import com.app.deafkeyboard.activities.user.UserChatMessagesActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
-public class MyDialogFragment extends DialogFragment implements SpellCheckerSession.SpellCheckerSessionListener {
+public class MyDialogFragment extends DialogFragment {
 
     private RecyclerView mRecyclerView,suggestions;
     TextView writtenMessage;
-    private SpellCheckerSession mScs;
+
     public Context context;
     public EditText message;
 
@@ -67,10 +68,6 @@ public class MyDialogFragment extends DialogFragment implements SpellCheckerSess
         suggestions = view.findViewById(R.id.suggestions);
         writtenMessage = view.findViewById(R.id.message_written);
 
-        final TextServicesManager tsm = (TextServicesManager)
-                context.getSystemService(Context.TEXT_SERVICES_MANAGER_SERVICE);
-        mScs = tsm.newSpellCheckerSession(null, null, this, true);
-
         writtenMessage.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -83,10 +80,10 @@ public class MyDialogFragment extends DialogFragment implements SpellCheckerSess
                     String text =charSequence.toString();
                     text = text.substring(text.indexOf(" ")+1);
                     if(!text.equals(""))
-                        mScs.getSuggestions(new TextInfo(text), 3);
+                        getSuggestions(text);
                 }else{
                     if(charSequence.length() > 0)
-                        mScs.getSuggestions(new TextInfo(charSequence.toString()), 3);
+                        getSuggestions(charSequence.toString());
                 }
 
             }
@@ -106,27 +103,19 @@ public class MyDialogFragment extends DialogFragment implements SpellCheckerSess
 
     }
 
-    @Override
-    public void onGetSuggestions(SuggestionsInfo[] arg0) {
+    private void getSuggestions(String word){
+        word = word.trim();
         ArrayList<String> suggestions1 = new ArrayList<>();
-
-        for (int i = 0; i < arg0.length; ++i) {
+        ArrayList<String> words = new AutoCorrectHelper().getWords();
+        for (int i = 0; i < words.size(); ++i) {
             // Returned suggestions are contained in SuggestionsInfo
-            final int len = arg0[i].getSuggestionsCount();
-
-            for (int j = 0; j < len; ++j) {
-                suggestions1.add(arg0[i].getSuggestionAt(j));
+            if(words.get(i).toLowerCase().contains(word)){
+                suggestions1.add(words.get(i));
             }
 
         }
 
         suggestions.setAdapter(new SuggestionsAdapter(suggestions1));
-
-    }
-
-    @Override
-    public void onGetSentenceSuggestions(SentenceSuggestionsInfo[] sentenceSuggestionsInfos) {
-
     }
 
 

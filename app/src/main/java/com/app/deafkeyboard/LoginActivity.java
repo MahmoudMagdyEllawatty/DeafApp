@@ -56,7 +56,8 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-                if(email.getText().toString().equals("admin@deaf.com") && password.getText().toString().equals("123456")){
+                if(email.getText().toString().equals("admin@deaf.com") &&
+                        password.getText().toString().equals("123456")){
                     Intent intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
